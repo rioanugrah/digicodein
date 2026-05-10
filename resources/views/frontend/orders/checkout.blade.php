@@ -22,7 +22,7 @@ Checkout
 
 @endsection
 @section('js')
-    <script src="{{ env('IS_PRODUCTION') == false ? env('MIDTRANS_LINK_DEMO') : env('MIDTRANS_LINK_LIVE') }}" data-client-key="{{ env('IS_PRODUCTION') == false ? env('MIDTRANS_CLIENT_KEY_DEMO') : env('MIDTRANS_CLIENT_KEY_LIVE') }}"></script>
+    <script src="{{ env('MIDTRANS_IS_PRODUCTION') == false ? env('MIDTRANS_LINK_DEMO') : env('MIDTRANS_LINK_LIVE') }}" data-client-key="{{ env('MIDTRANS_IS_PRODUCTION') == false ? env('MIDTRANS_CLIENT_KEY_DEMO') : env('MIDTRANS_CLIENT_KEY_LIVE') }}"></script>
     <script src="{{ asset('/') }}assets/vendor/sweetalert2/sweetalert2.min.js"></script>
     <script>
         document.getElementById('pay-button').onclick = function() {
