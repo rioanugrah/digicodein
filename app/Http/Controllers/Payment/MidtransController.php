@@ -13,8 +13,8 @@ class MidtransController extends Controller
 {
     function __construct()
     {
-        $this->midtrans_client_key = env('MIDTRANS_IS_PRODUCTION') == true ? env('MIDTRANS_CLIENT_KEY_LIVE') : env('MIDTRANS_SERVER_KEY_DEMO');
-        $this->midtrans_server_key = env('MIDTRANS_IS_PRODUCTION') == true ? env('MIDTRANS_SERVER_KEY_DEMO') : env('MIDTRANS_CLIENT_KEY_DEMO');
+        $this->midtrans_client_key = env('MIDTRANS_IS_PRODUCTION') == true ? env('MIDTRANS_CLIENT_KEY_LIVE') : env('MIDTRANS_CLIENT_KEY_DEMO');
+        $this->midtrans_server_key = env('MIDTRANS_IS_PRODUCTION') == true ? env('MIDTRANS_SERVER_KEY_LIVE') : env('MIDTRANS_SERVER_KEY_DEMO');
         $this->url_payment = env('MIDTRANS_IS_PRODUCTION') == true ? env('MIDTRANS_LINK_LIVE') : env('MIDTRANS_LINK_DEMO');
     }
 
