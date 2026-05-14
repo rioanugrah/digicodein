@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Payment;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Gateways\WhatsappController;
 use Illuminate\Http\Request;
 
 use Telegram\Bot\Laravel\Facades\Telegram;
@@ -77,6 +78,7 @@ class MidtransController extends Controller
                             Telegram::sendMessage([
                                 'chat_id' => env('TELEGRAM_CHAT_ID'),
                                 'text' => 'Invoice : '.$request->order_id."\n".
+                                            'Tanggal Pembayaran : '.date('Y-m-d H:i:s')."\n".
                                             'Booking Name : '.$request['customer_details']['full_name']."\n".
                                             'Booking Email : '.$request['customer_details']['email']."\n".
                                             'Booking Phone : '.$request['customer_details']['phone']."\n".
@@ -84,6 +86,15 @@ class MidtransController extends Controller
                                             'Status : '.$request->transaction_status."\n\n".
                                             '* Notifikasi ini sah dan dibuat oleh sistem.'
                             ]);
+
+                            $message = 'Terima kasih *'.$request['customer_details']['full_name'].'* telah belanja di DigiCodein. berikut melampirkan bukti pembayaran : '."\n\n".
+                                'Invoice : '.$request->order_id."\n".
+                                'Tanggal Pembayaran : '.date('Y-m-d H:i:s')."\n".
+                                'Total : Rp. '.number_format($request->gross_amount,0,',','.')."\n".
+                                'Status : PAID'."\n\n".
+                                '*Notifikasi ini sah dan dibuat oleh sistem.*';
+
+                            (new WhatsappController)->sendNotification($request['customer_details']['phone'],$message);
                         }
                     }
                     break;
@@ -105,6 +116,7 @@ class MidtransController extends Controller
                     Telegram::sendMessage([
                         'chat_id' => env('TELEGRAM_CHAT_ID'),
                         'text' => 'Invoice : '.$request->order_id."\n".
+                                    'Tanggal Pembayaran : '.date('Y-m-d H:i:s')."\n".
                                     'Booking Name : '.$request['customer_details']['full_name']."\n".
                                     'Booking Email : '.$request['customer_details']['email']."\n".
                                     'Booking Phone : '.$request['customer_details']['phone']."\n".
@@ -112,6 +124,15 @@ class MidtransController extends Controller
                                     'Status : '.$request->transaction_status."\n\n".
                                     '* Notifikasi ini sah dan dibuat oleh sistem.'
                     ]);
+
+                    $message = 'Terima kasih *'.$request['customer_details']['full_name'].'* telah belanja di DigiCodein. berikut melampirkan bukti pembayaran : '."\n\n".
+                                'Invoice : '.$request->order_id."\n".
+                                'Tanggal Pembayaran : '.date('Y-m-d H:i:s')."\n".
+                                'Total : Rp. '.number_format($request->gross_amount,0,',','.')."\n".
+                                'Status : PAID'."\n\n".
+                                '*Notifikasi ini sah dan dibuat oleh sistem.*';
+
+                    (new WhatsappController)->sendNotification($request['customer_details']['phone'],$message);
                     break ;
                 case 'pending' :
                     $payment->update([

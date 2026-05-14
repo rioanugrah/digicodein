@@ -51,4 +51,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->belongsTo(\App\Models\Profiles::class, 'id','user_id');
     }
+
+    public function isOnline()
+    {
+        return \Cache::has('user-is-online-' . $this->id);
+    }
 }

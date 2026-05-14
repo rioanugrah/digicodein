@@ -25,6 +25,9 @@ class OrdersController extends Controller
             $data = $this->order->get();
             return DataTables::of($data)
                             ->addIndexColumn()
+                            ->addColumn('tgl_order', function($row){
+                                return $row->created_at->format('Y-m-d H:i:s');
+                            })
                             ->addColumn('billings', function($row){
                                 return json_decode($row->payments->payment_billing)->first_name.' '.json_decode($row->payments->payment_billing)->last_name;
                             })

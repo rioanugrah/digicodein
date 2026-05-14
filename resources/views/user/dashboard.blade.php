@@ -141,10 +141,21 @@
                                         </td>
                                         <td class="text-center">
                                             <div class="flex-wrap gap-2 text-center">
-                                                @if ($item->status == 'Success')
+                                                @switch($item->payments->payment_status)
+                                                    @case('Unpaid')
+                                                        <button type="button" class="btn btn-yellow btn-sm payment" data-id="{{ $item->payments->payment_token }}">Bayar Sekarang</a>
+                                                        @break
+                                                    @case('Paid')
+                                                        <button type="button" class="btn btn-green btn-sm" onclick="orderDetail(`{{ $item->id }}`)"><i class="ri-eye-line me-1"></i> Detail</button>
+                                                        <a href="{{ route('user.orderInvoice',['id' => $item->id]) }}" target="_blank" class="btn btn-blue btn-sm"><i class="ri-download-2-line me-1"></i> Invoice</a>
+                                                        @break
+                                                    @default
+
+                                                @endswitch
+                                                {{-- @if ($item->status == 'Success')
                                                 <button type="button" class="btn btn-green btn-sm" onclick="orderDetail(`{{ $item->id }}`)"><i class="ri-eye-line me-1"></i> Detail</button>
                                                 <a href="{{ route('user.orderInvoice',['id' => $item->id]) }}" target="_blank" class="btn btn-blue btn-sm"><i class="ri-download-2-line me-1"></i> Invoice</a>
-                                                @endif
+                                                @endif --}}
                                             </div>
                                         </td>
                                     </tr>
@@ -162,6 +173,8 @@
 @endsection
 @section('js')
     <script src="{{ asset('/') }}assets/vendor/sweetalert2/sweetalert2.min.js"></script>
+    <script src="{{ env('MIDTRANS_IS_PRODUCTION') == false ? env('MIDTRANS_LINK_DEMO') : env('MIDTRANS_LINK_LIVE') }}" data-client-key="{{ env('MIDTRANS_IS_PRODUCTION') == false ? env('MIDTRANS_CLIENT_KEY_DEMO') : env('MIDTRANS_CLIENT_KEY_LIVE') }}"></script>
+
     <script>
         function orderDetail(id)
         {
@@ -194,11 +207,16 @@
                         //             '</div>'+
                         //             '<div>'+value.link_description+'</div>'+
                         //         '</div>';
+                        if (value.lisensi == null) {
+                            var textLisensi = '-';
+                        }else{
+                            var textLisensi = value.lisensi;
+                        }
 
                         return '<tr>'+
                                     '<td>'+value.order_item+'</td>'+
                                     '<td>'+value.link_description+'</td>'+
-                                    '<td>'+value.lisensi+'</td>'+
+                                    '<td>'+textLisensi+'</td>'+
                                     '<td>'+
                                         '<a href='+value.link_download+' target="_blank" class="btn btn-green btn-sm"><i class="ri-download-2-line me-1"></i>Download</a>'+
                                     '</td>'+
@@ -214,5 +232,52 @@
                 }
             });
         }
+
+        $(document).on('click', '.payment', function(e) {
+            e.preventDefault();
+            let id = $(this).data('id');
+
+            snap.pay(id, {
+                onSuccess: function(result) {
+                    // Tangani jika pembayaran berhasil
+                    // alert('Pembayaran Berhasil');
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: 'Pembayaran Telah Berhasil.',
+                        icon: 'success',
+                        customClass: {
+                            confirmButton: 'btn btn-primary mt-2',
+                        },
+                        buttonsStyling: false
+                    }).then((result) => {
+                        if (result.isConfirmed) window.location.reload();
+                    });
+                },
+                onPending: function(result) {
+                    // Tangani jika pembayaran pending
+                    Swal.fire({
+                        title: 'Menunggu!',
+                        text: 'Sedang Menunggu Pembayaran.',
+                        icon: 'warning',
+                        customClass: {
+                            confirmButton: 'btn btn-primary mt-2',
+                        },
+                        buttonsStyling: false
+                    })
+                },
+                onError: function(result) {
+                    // Tangani jika pembayaran gagal
+                    Swal.fire({
+                        title: 'Gagal!',
+                        text: 'Pembayaran Gagal.',
+                        icon: 'error',
+                        customClass: {
+                            confirmButton: 'btn btn-primary mt-2',
+                        },
+                        buttonsStyling: false
+                    })
+                }
+            });
+        });
     </script>
 @endsection

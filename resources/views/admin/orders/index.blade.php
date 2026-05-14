@@ -50,6 +50,7 @@
                         <table class="table table-striped mb-0" id="datatables">
                             <thead>
                                 <tr>
+                                    <th>Tanggal Order</th>
                                     <th>Kode Order</th>
                                     <th>Billings</th>
                                     <th>Total</th>
@@ -87,6 +88,10 @@
             serverSide: true,
             ajax: "{{ route('admin.orders.index') }}",
             columns: [
+                {
+                    data: 'tgl_order',
+                    name: 'tgl_order'
+                },
                 {
                     data: 'order_code',
                     name: 'order_code'
@@ -169,11 +174,16 @@
                     document.getElementById('detailTglOrder').innerHTML = result.data.order_date;
 
                     const orderItems = result.data.order_items.map((value,index) => {
+                        if (value.lisensi == null) {
+                            var textLisensi = '-';
+                        }else{
+                            var textLisensi = value.lisensi;
+                        }
 
                         return '<tr>'+
                                     '<td>'+value.order_item+'</td>'+
                                     '<td>'+value.link_description+'</td>'+
-                                    '<td>'+value.lisensi+'</td>'+
+                                    '<td>'+textLisensi+'</td>'+
                                     '<td>'+
                                         '<a href='+value.link_download+' target="_blank" class="btn btn-green btn-sm"><i class="ri-download-2-line me-1"></i>Download</a>'+
                                     '</td>'+

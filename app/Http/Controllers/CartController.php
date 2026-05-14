@@ -205,43 +205,21 @@ class CartController extends Controller
         }
 
         // dd(array_sum($totalPrice));
-
-        $payment = $this->payments->create([
-            'id' => $idPayment,
-            'amount' => array_sum($totalPrice),
-            'fee_admin' => 0,
-            'payment_method' => '-',
-            'payment_references' => $data['references'],
-            'payment_billing' => json_encode([
-                'first_name' => auth()->user()->profile->first_name,
-                'last_name' => auth()->user()->profile->last_name,
-                'email' => auth()->user()->email,
-                'phone' => auth()->user()->profile->phone_number,
-            ]),
-            'payment_status' => 'Unpaid'
+        $order = $this->orders->create([
+            'id' => $idOrder,
+            'user_id' => auth()->user()->id,
+            'payment_id' => $idPayment,
+            'order_code' => 'ORD-'.$noTrx,
+            // 'order_item' => $data['product']['product_name'],
+            'total_price' => array_sum($totalPrice),
+            'status' => 'Pending'
         ]);
 
-        if ($payment) {
-            $order = $this->orders->create([
-                'id' => $idOrder,
-                'user_id' => auth()->user()->id,
-                'payment_id' => $idPayment,
-                'order_code' => 'ORD-'.$noTrx,
-                // 'order_item' => $data['product']['product_name'],
-                'total_price' => array_sum($totalPrice),
-                'status' => 'Pending'
-            ]);
-
-            $this->cart->with('cartItems')->where('user_id',auth()->user()->id)
-                                        ->where('status','O')
-                                        ->update([
-                                            'status' => 'C'
-                                        ]);
-
+        if ($order) {
             \Midtrans\Config::$serverKey = $this->midtrans_server_key;
             \Midtrans\Config::$isProduction = env('MIDTRANS_IS_PRODUCTION');
             \Midtrans\Config::$isSanitized = true;
-            \Midtrans\Config::$is3ds = true;
+            \Midtrans\Config::$is3ds = env('MIDTRANS_IS_3DS');
 
             $params = [
                 'transaction_details' => [
@@ -259,6 +237,30 @@ class CartController extends Controller
             $data['midtrans_client_key'] = $this->midtrans_client_key;
             $data['link_url_payment'] = $this->url_payment;
             $data['snapToken'] = \Midtrans\Snap::getSnapToken($params);
+
+            $payment = $this->payments->create([
+                'id' => $idPayment,
+                'amount' => array_sum($totalPrice),
+                'fee_admin' => 0,
+                'payment_method' => '-',
+                'payment_references' => $data['references'],
+                'payment_token' => $data['snapToken'],
+                'payment_billing' => json_encode([
+                    'first_name' => auth()->user()->profile->first_name,
+                    'last_name' => auth()->user()->profile->last_name,
+                    'email' => auth()->user()->email,
+                    'phone' => auth()->user()->profile->phone_number,
+                ]),
+                'payment_status' => 'Unpaid'
+            ]);
+
+            $this->cart->with('cartItems')->where('user_id',auth()->user()->id)
+                                        ->where('status','O')
+                                        ->update([
+                                            'status' => 'C'
+                                        ]);
+
+
         }
 
         $data['total'] = array_sum($totalPrice);
