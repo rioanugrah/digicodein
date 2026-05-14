@@ -87,6 +87,8 @@ class ProductController extends Controller
             'product_quantity' => 'required',
             'product_price' => 'required',
             'product_image_cover' => 'required',
+            'product_link' => 'required',
+            'product_link_description' => 'required',
             'status' => 'required',
         ];
 
@@ -96,6 +98,8 @@ class ProductController extends Controller
             'product_quantity.required' => 'Stok Produk Wajib Diisi',
             'product_price.required' => 'Harga Produk Wajib Diisi',
             'product_image_cover.required' => 'Gambar Cover Produk Wajib Diisi',
+            'product_link.required' => 'Produk Link Wajib Diisi',
+            'product_link_description.required' => 'Produk Link Deskripsi Wajib Diisi',
             'status.required' => 'Status Wajib Diisi',
         ];
 
@@ -110,6 +114,8 @@ class ProductController extends Controller
             $input['product_description'] = $request->product_description;
             $input['product_quantity'] = $request->product_quantity;
             $input['product_price'] = $request->product_price;
+            $input['product_link'] = $request->product_link;
+            $input['product_link_description'] = $request->product_link_description;
             $input['status'] = $request->status;
 
             if ($request->file('product_image_cover')) {
