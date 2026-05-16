@@ -65,6 +65,11 @@
                     <i class="ri-moon-line fs-22"></i>
                 </button>
             </div>
+            <div class="topbar-item d-none d-sm-flex">
+                <a href="{{ route('user.cart') }}" class="topbar-link" >
+                    <i class="ri-account-circle-line fs-22"></i>
+                </a>
+            </div>
 
             <!-- User Dropdown -->
             <div class="topbar-item nav-user">

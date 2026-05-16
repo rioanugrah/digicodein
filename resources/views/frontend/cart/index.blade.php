@@ -220,15 +220,15 @@
                     </div>
 
                     <div class="d-flex justify-content-between mb-4 text-muted">
-                        <span>Pajak (11%)</span>
+                        <span>Pajak (0%)</span>
                         <span id="summary-tax">Rp 0</span>
                     </div>
 
-                    <div class="input-group mb-4">
+                    {{-- <div class="input-group mb-4">
                         <input type="text" class="form-control bg-light border-0" placeholder="Kode Promo"
                             style="padding: 12px; border-radius: 12px 0 0 12px;">
                         <button class="btn btn-dark px-3" type="button" style="border-radius: 0 12px 12px 0;">Gunakan</button>
-                    </div>
+                    </div> --}}
 
                     <hr class="my-4 opacity-50">
 
