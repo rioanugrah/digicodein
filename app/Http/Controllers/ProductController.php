@@ -124,7 +124,7 @@ class ProductController extends Controller
                 $tujuanUploadCover = 'digicodein/product/'.$input['product_code'];
                 $imgCover = Image::make($fileCover->path());
                 $imgCover = $imgCover->encode('webp', 30);
-                $fileNameCover = 'product_'.Carbon::now()->format('dmY_His').'_'.rand(1000,9999).'.webp';
+                $fileNameCover = 'product_'.Carbon::now()->format('dmY_His').'_'.$input['product_code'].'.webp';
 
                 Storage::disk('s3')->putFileAs($tujuanUploadCover, $fileCover, $fileNameCover);
                 Storage::disk('s3')->setVisibility($tujuanUploadCover."/".$fileNameCover,"public");
