@@ -109,6 +109,12 @@ class MidtransController extends Controller
                         'status' => 'Success'
                     ]);
 
+                    foreach ($payment->orders->orderItems as $key => $value) {
+                        $value->product->update([
+                            'product_quantity' => $value->product->product_quantity - $value->quantity
+                        ]);
+                    }
+
                     // $payment->orders->product->update([
                     //     'product_quantity' => $payment->orders->product->product_quantity - 1
                     // ]);

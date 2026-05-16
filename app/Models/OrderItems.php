@@ -21,4 +21,9 @@ class OrderItems extends Model
         return $this->belongsTo(\App\Models\Product::class, 'order_item','product_name')->select('product_link','product_link_description');
     }
 
+    public function product()
+    {
+        return $this->belongsTo(\App\Models\Product::class, 'order_item','product_name');
+    }
+
 }
