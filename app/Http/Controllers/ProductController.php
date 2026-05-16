@@ -95,6 +95,7 @@ class ProductController extends Controller
         $messages = [
             'product_name.required' => 'Nama Produk Wajib Diisi',
             'product_name.unique' => 'Produk '.$request->product_name.' Sudah Ada',
+            'product_description.required' => 'Produk Deskripsi Wajib Diisi',
             'product_quantity.required' => 'Stok Produk Wajib Diisi',
             'product_price.required' => 'Harga Produk Wajib Diisi',
             'product_image_cover.required' => 'Gambar Cover Produk Wajib Diisi',
