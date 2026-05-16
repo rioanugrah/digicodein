@@ -120,6 +120,7 @@ class ProductController extends Controller
             $input['status'] = $request->status;
 
             if ($request->file('product_image_cover')) {
+                dd('OKE');
                 $fileCover = $request->file('product_image_cover');
                 $tujuanUploadCover = 'digicodein/product/'.$input['product_code'];
                 $imgCover = Image::make($fileCover->path());
