@@ -47,5 +47,6 @@ Route::group(['middleware' => 'auth'], function () {
 });
 
 // Route::get('payment/test', [App\Http\Controllers\Payment\MidtransController::class, 'test_payment']);
-// Route::get('testing/wa', [App\Http\Controllers\TestingController::class, 'testingWA']);
+Route::get('testing/wa', [App\Http\Controllers\TestingController::class, 'twilioWA']);
+Route::get('testing/sms', [App\Http\Controllers\TestingController::class, 'twilioSms']);
 // Route::get('testing/telegram', [App\Http\Controllers\TestingController::class, 'testingTelegram']);

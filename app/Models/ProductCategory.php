@@ -20,4 +20,15 @@ class ProductCategory extends Model
     {
         return $this->hasMany(\App\Models\Product::class);
     }
+
+    protected static function booted():void
+    {
+        static::created(function (ProductCategory $product_category){
+            Cache::forget('product_category');
+        });
+
+        static::updated(function (ProductCategory $product_category){
+            Cache::forget('product_category');
+        });
+    }
 }

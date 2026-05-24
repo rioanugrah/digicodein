@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+
 use App\Models\Payments;
 use App\Models\Orders;
 
@@ -24,7 +26,10 @@ class TransactionsController extends Controller
     public function payment_index(Request $request)
     {
         if ($request->ajax()) {
-            $data = $this->payment->get();
+            // $data = $this->payment->get();
+            $data = Cache::remember('product_category', 60, function(){
+                return $this->payment->get();
+            });
             return DataTables::of($data)
                             ->addIndexColumn()
                             ->addColumn('tanggal_pembayaran', function($row){
@@ -66,7 +71,7 @@ class TransactionsController extends Controller
                                     case 'Unknown':
                                         return '<span class="badge badge-red">'.$row->payment_status.'</span>';
                                         break;
-                                    
+
                                     default:
                                         # code...
                                         break;
@@ -92,7 +97,7 @@ class TransactionsController extends Controller
     public function payment_detail($id)
     {
         $data = $this->payment->find($id);
-        
+
         if (empty($data)) {
             return response()->json([
                 'success' => false,

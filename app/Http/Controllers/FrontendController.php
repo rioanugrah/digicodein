@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
 
 use App\Models\Slider;
 use App\Models\Product;
@@ -40,8 +41,14 @@ class FrontendController extends Controller
 
     public function index()
     {
-        $data['categorys'] = $this->productCategory->with('products')->where('status','Active')->orderBy('created_at','desc')->get();
-        $data['sliders'] = $this->slider->where('status','Active')->orderBy('created_at','desc')->get();
+        $data['categorys'] = Cache::remember('product_category', 60, function(){
+            return $this->productCategory->with('products')->where('status','Active')->orderBy('created_at','desc')->get();
+        });
+
+        $data['sliders'] = Cache::remember('slider', 60, function(){
+            return $this->slider->where('status','Active')->orderBy('created_at','desc')->get();
+        });
+
         // dd($data);
         return view('frontend.index',$data);
     }

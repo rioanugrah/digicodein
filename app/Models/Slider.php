@@ -16,4 +16,15 @@ class Slider extends Model
 
     protected $guarded = [];
 
+    protected static function booted():void
+    {
+        static::created(function (Slider $slider){
+            Cache::forget('slider');
+        });
+
+        static::updated(function (Slider $slider){
+            Cache::forget('slider');
+        });
+    }
+
 }

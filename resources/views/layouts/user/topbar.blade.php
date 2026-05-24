@@ -67,7 +67,7 @@
             </div>
             <div class="topbar-item d-none d-sm-flex">
                 <a href="{{ route('user.cart') }}" class="topbar-link" >
-                    <i class="ri-account-circle-line fs-22"></i>
+                    <i class="ri-shopping-cart-2-line fs-22"></i>
                 </a>
             </div>
 
