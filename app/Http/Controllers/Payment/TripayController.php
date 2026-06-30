@@ -1,0 +1,308 @@
+<?php
+
+namespace App\Http\Controllers\Payment;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
+
+use App\Models\Payments;
+
+use \Carbon\Carbon;
+
+class TripayController extends Controller
+{
+    function __construct(
+        Payments $payments
+    ){
+        if (env('TRIPAY_IS_PRODUCTION') == false) {
+            $this->tripay_api_key = env('TRIPAY_API_KEY_SANDBOX');
+            $this->tripay_private_key = env('TRIPAY_PRIVATE_KEY_SANDBOX');
+            $this->tripay_merchant = env('TRIPAY_MERCHANT_SANDBOX');
+            $this->tripay_url = env('TRIPAY_SANDBOX');
+        }else{
+            $this->tripay_api_key = env('TRIPAY_API_KEY_PRODUCTION');
+            $this->tripay_private_key = env('TRIPAY_PRIVATE_KEY_PRODUCTION');
+            $this->tripay_merchant = env('TRIPAY_MERCHANT_PRODUCTION');
+            $this->tripay_url = env('TRIPAY_PRODUCTION');
+        }
+        
+        $this->payments = $payments;
+    }
+
+    public function getPayment()
+    {
+        $apiKey = $this->tripay_api_key;
+        $url_tripay = $this->tripay_url;
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_FRESH_CONNECT  => true,
+            CURLOPT_URL            => $url_tripay.'/merchant/payment-channel',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HEADER         => false,
+            CURLOPT_HTTPHEADER     => ['Authorization: Bearer '.$apiKey],
+            CURLOPT_FAILONERROR    => false,
+            CURLOPT_IPRESOLVE      => CURL_IPRESOLVE_V4
+        ));
+
+        $response = curl_exec($curl);
+        // dd($response);
+        $error = curl_error($curl);
+
+        curl_close($curl);
+
+        // echo empty($error) ? $response : $error;
+        return $response ? $response : $error;
+    }
+
+    public function requestTransaction(
+        $product,
+        $method,
+        $amount,
+        $first_name,
+        $last_name,
+        $email,
+        $phone,
+        $merchantRef,
+        $url
+        )
+        {
+            $apiKey       = $this->tripay_api_key;
+            $privateKey   = $this->tripay_private_key;
+            $merchantCode = $this->tripay_merchant;
+            $merchantRef  = $merchantRef;
+            $amount       = $amount;
+            $url_tripay   = $this->tripay_url;
+            $return_url   = $url;
+
+            $data = [
+                'method'         => $method,
+                'merchant_ref'   => $merchantRef,
+                'amount'         => $amount,
+                'customer_name'  => $first_name.' '.$last_name,
+                'customer_email' => $email,
+                'customer_phone' => $phone,
+                'order_items'    => $product,
+                // 'order_items'    => [
+                //     [
+                //     'name'        => $product,
+                //     'price'       => $amount,
+                //     'quantity'    => 1,
+                //     // 'product_url' => 'https://tokokamu.com/product/nama-produk-1',
+                //     // 'image_url'   => 'https://tokokamu.com/product/nama-produk-1.jpg',
+                //     ]
+                // ],
+                // 'return_url'   => 'https://domainanda.com/redirect',
+                'callback_url'   => env('APP_URL').'/api/callback',
+                'return_url'   => $return_url,
+                'expired_time' => (time() + (24 * 60 * 60)), // 24 jam
+                'signature'    => hash_hmac('sha256', $merchantCode.$merchantRef.$amount, $privateKey)
+                ];
+
+                $curl = curl_init();
+
+                curl_setopt_array($curl, [
+                    CURLOPT_FRESH_CONNECT  => true,
+                    CURLOPT_URL            => $url_tripay.'/transaction/create',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_HEADER         => false,
+                    CURLOPT_HTTPHEADER     => ['Authorization: Bearer '.$apiKey],
+                    CURLOPT_FAILONERROR    => false,
+                    CURLOPT_POST           => true,
+                    CURLOPT_POSTFIELDS     => http_build_query($data),
+                    CURLOPT_IPRESOLVE      => CURL_IPRESOLVE_V4
+                ]);
+
+                $response = curl_exec($curl);
+                $error = curl_error($curl);
+
+                curl_close($curl);
+                // dd(json_decode($response)->data);
+                // echo empty($error) ? $response : $error;
+                return $response ? $response : $error;
+            }
+
+    public function detailTransaction($reference)
+    {
+        $apiKey = $this->tripay_api_key;
+
+        $payload = ['reference'	=> $reference];
+
+        $curl = curl_init();
+
+        $url_tripay = $this->tripay_url;
+
+        curl_setopt_array($curl, [
+            CURLOPT_FRESH_CONNECT  => true,
+            CURLOPT_URL            => $url_tripay.'/transaction/detail?'.http_build_query($payload),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HEADER         => false,
+            CURLOPT_HTTPHEADER     => ['Authorization: Bearer '.$apiKey],
+            CURLOPT_FAILONERROR    => false,
+            CURLOPT_IPRESOLVE      => CURL_IPRESOLVE_V4
+        ]);
+
+        $response = curl_exec($curl);
+        $error = curl_error($curl);
+
+        curl_close($curl);
+
+        // echo empty($error) ? $response : $error;
+        return $response ? $response : $error;
+    }
+
+    public function handle(Request $request)
+    {
+        // dd($request->all());
+        $privateKey = $this->tripay_private_key;
+        $callbackSignature = $request->server('HTTP_X_CALLBACK_SIGNATURE');
+        // dd($callbackSignature);
+        $json = $request->getContent();
+        $signature = hash_hmac('sha256', $json, $privateKey);
+        if ($signature !== (string) $callbackSignature) {
+            return Response::json([
+                'success' => false,
+                'message' => 'Invalid signature',
+            ]);
+        }
+
+        if ('payment_status' !== (string) $request->server('HTTP_X_CALLBACK_EVENT')) {
+            return Response::json([
+                'success' => false,
+                'message' => 'Unrecognized callback event, no action was taken',
+            ]);
+        }
+
+        $data = json_decode($json);
+
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            return Response::json([
+                'success' => false,
+                'message' => 'Invalid data sent by tripay',
+            ]);
+        }
+
+        $invoiceId = $data->merchant_ref;
+        $tripayReference = $data->reference;
+        $status = strtoupper((string) $data->status);
+
+        if ($data->is_closed_payment === 1) {
+            $transaction = $this->payments->where('payment_references',$data->merchant_ref)
+                                            ->first();
+            if (!$transaction) {
+                return Response::json([
+                    'success' => false,
+                    'message' => 'No invoice found or already paid: ' . $invoiceId,
+                ]);
+            }
+            
+            switch ($status) {
+                case 'PAID':
+                    $transaction->update([
+                        // 'transaction_reference' => $data->reference,
+                        'payment_status' => 'Paid'
+                    ]);
+                    break;
+
+                case 'EXPIRED':
+                    $transaction->update([
+                        // 'transaction_reference' => $data->reference,
+                        'payment_status' => 'Expired'
+                    ]);
+                    break;
+
+                case 'FAILED':
+                    $transaction->update([
+                        // 'transaction_reference' => $data->reference,
+                        'payment_status' => 'Failed'
+                    ]);
+                    break;
+
+                default:
+                    return Response::json([
+                        'success' => false,
+                        'message' => 'Unrecognized payment status',
+                    ]);
+            }
+            // $transaction = $this->transactions->where('transaction_code',$data->merchant_ref)
+            //                                 // ->where('status','Unpaid')
+            //                                 ->first();
+            // if (!$transaction) {
+            //     return Response::json([
+            //         'success' => false,
+            //         'message' => 'No invoice found or already paid: ' . $invoiceId,
+            //     ]);
+            // }
+            // switch ($status) {
+            //     case 'PAID':
+            //         $transaction->update([
+            //             // 'transaction_reference' => $data->reference,
+            //             'status' => 'Paid'
+            //         ]);
+            //         break;
+
+            //     case 'EXPIRED':
+            //         $transaction->update([
+            //             // 'transaction_reference' => $data->reference,
+            //             'status' => 'Expired'
+            //         ]);
+            //         break;
+
+            //     case 'FAILED':
+            //         $transaction->update([
+            //             // 'transaction_reference' => $data->reference,
+            //             'status' => 'Failed'
+            //         ]);
+            //         break;
+
+            //     default:
+            //         return Response::json([
+            //             'success' => false,
+            //             'message' => 'Unrecognized payment status',
+            //         ]);
+            // }
+
+            return Response::json(['success' => true]);
+        }
+    }
+
+    public function handle_open_payment(Request $request)
+    {
+        $privateKey = $this->tripay_private_key;
+        $callbackSignature = $request->server('HTTP_X_CALLBACK_SIGNATURE');
+        $merchantCode = $this->tripay_merchant;
+        $channel = 'BCAVA';
+        // $merchantRef = 'INV'.rand(1000000,999999);
+        $merchantRef = 'INV587214';
+        // dd($merchantRef);
+        $signature = hash_hmac('sha256', $merchantCode.$channel.$merchantRef, $privateKey);
+        // dd($signature);
+        if ($signature !== (string) $callbackSignature) {
+            return Response::json([
+                'success' => false,
+                'message' => 'Invalid signature',
+            ]);
+        }
+
+        if ('payment_status' !== (string) $request->server('HTTP_X_CALLBACK_EVENT')) {
+            return Response::json([
+                'success' => false,
+                'message' => 'Unrecognized callback event, no action was taken',
+            ]);
+        }
+
+        $data = json_decode($json);
+
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            return Response::json([
+                'success' => false,
+                'message' => 'Invalid data sent by tripay',
+            ]);
+        }
+
+        $invoiceId = $data->merchant_ref;
+        $tripayReference = $data->reference;
+        $status = strtoupper((string) $data->status);
+    }
+}
