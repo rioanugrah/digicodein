@@ -45,19 +45,45 @@
         </div>
     </div>
 </footer> --}}
-<footer class="card pt-5 pb-4">
+<footer class="card pt-5 pb-4 bottom-0">
     <div class="card-body">
         <div class="container">
             <div class="row gy-4">
                 <div class="col-lg-4 col-md-12">
                     <img src="{{ asset('/') }}logo/LogoDigiCodein.png" style="width: 200px; height: 70px"
                             alt="Logo DigiCodein">
+                    <p></p>
                 </div>
                 <div class="col-md-8">
-                    <h6 class="footer-title">Hubungi Kami</h6>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="#" class="footer-link">support@digicodein.com</a></li>
-                    </ul>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="fw-bold fs-4 mb-3">Perusahaan</div>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <a href="{{ route('frontend.tentang_kami') }}" class="footer-link">Tentang Kami</a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="{{ route('frontend.syarat_ketentuan') }}" class="footer-link">Syarat & Ketentuan</a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="{{ route('frontend.kebijakan_privasi') }}" class="footer-link">Kebijakan Privasi</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="fw-bold fs-4 mb-3">Hubungi Kami</div>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <div class="fw-bold">Team Support</div>
+                                    <a href="#" class="footer-link">support@digicodein.com</a>
+                                </li>
+                                <li class="mb-2">
+                                    <div class="fw-bold">Marketing</div>
+                                    <a href="#" class="footer-link">marketing@digicodein.com</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -33,6 +33,11 @@ Route::controller(App\Http\Controllers\FrontendController::class)->group(functio
     });
 });
 
+Route::get('tentang-kami', [App\Http\Controllers\FrontendController::class, 'tentang_kami'])->name('frontend.tentang_kami');
+
+Route::get('syarat-ketentuan', [App\Http\Controllers\FrontendController::class, 'syarat_ketentuan'])->name('frontend.syarat_ketentuan');
+Route::get('kebijakan-privasi', [App\Http\Controllers\FrontendController::class, 'kebijakan_privasi'])->name('frontend.kebijakan_privasi');
+
 Route::group(['middleware' => 'auth'], function () {
     Route::controller(App\Http\Controllers\FrontendController::class)->group(function () {
         Route::prefix('product')->group(function(){

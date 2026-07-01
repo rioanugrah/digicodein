@@ -74,6 +74,27 @@ class FrontendController extends Controller
 
         return view('frontend.products.detail',$data);
     }
+    
+    public function tentang_kami()
+    {
+        $data['categorys'] = $this->productCategory->where('status','Active')->orderBy('created_at','desc')->get();
+
+        return view('frontend.tentangKami.index',$data);
+    }
+    
+    public function syarat_ketentuan()
+    {
+        $data['categorys'] = $this->productCategory->where('status','Active')->orderBy('created_at','desc')->get();
+
+        return view('frontend.syaratKetentuan.index',$data);
+    }
+    
+    public function kebijakan_privasi()
+    {
+        $data['categorys'] = $this->productCategory->where('status','Active')->orderBy('created_at','desc')->get();
+
+        return view('frontend.kebijakanPrivasi.index',$data);
+    }
 
     public function order($slug)
     {
