@@ -22,6 +22,4 @@ Route::controller(App\Http\Controllers\Payment\MidtransController::class)->group
     Route::post('midtrans/callback', 'callback');
 });
 
-Route::domain('api'.parse_url(env('APP_URL'), PHP_URL_HOST))->group(function () {
-    Route::post('callback', [App\Http\Controllers\Payment\TripayController::class, 'handle']);
-});
+Route::post('callback', [App\Http\Controllers\Payment\TripayController::class, 'handle']);
