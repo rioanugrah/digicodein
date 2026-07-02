@@ -9,7 +9,7 @@ Tentang Kami
                 <div class="col-lg-6">
                     <span class="badge bg-primary bg-opacity-10 text-primary mb-3 p-2 px-3">Inovasi Teknologi 2026</span>
                     <h1 class="display-3 fw-bold mb-4">Membangun Masa Depan Bisnis Digital Anda</h1>
-                    <p class="lead mb-4">Digicodein adalah ruang kreatif bagi para developer, kreator, dan pemikir digital untuk berkumpul. Kami mengembangkan platform web dengan standar performa tinggi, memastikan setiap interaksi pengguna terasa mulus dan berdampak.</p>
+                    <p class="lead mb-4">Digicodein adalah hub produk digital premium yang dirancang khusus untuk mempercepat workflow para developer, desainer, dan pelaku bisnis. Kami menyediakan aset digital siap pakai—mulai dari source code berbasis Laravel yang kokoh, komponen UI modern (Bootstrap & Tailwind), hingga ekosistem template aplikasi web yang scalable. Di Digicodein, setiap produk diracik dengan standar clean code terbaik dan performa tinggi</p>
                 </div>
                 <div class="col-lg-6 text-center d-none d-lg-block">
                     <img src="https://placehold.co/600x400/0d6efd/ffffff?text=Digital+Innovation" class="img-fluid rounded-4 shadow" alt="Hero">
